@@ -1,0 +1,136 @@
+{% extends 'catalog/base.html' %}
+{% load template_tags %}
+
+{% block title %}Сотрудники{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top">
+                <h1>Сотрудники</h1>
+                <!-- Форма фильтрации -->
+                <form method="get" class="d-flex">
+                    <div class="me-2">{{ filter.form.company }}</div>
+                    <div class="me-2">{{ filter.form.fired }}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_filter">Фильтровать</button>
+                <!-- Кнопка-триггер модального окна - Сотрудники-->
+                {% if request.user|has_group:"WorkersEdit" %}
+                    <button type="button" class="btn btn-secondary btn-sm button_doc ms-auto" data-bs-toggle="modal"
+                            data-bs-target="#modal_workers"><i class="bi bi-plus-lg"></i>Добавить запись
+                    </button>
+                {% endif %}
+                {% if messages %}
+                    <div class="alert alert-dark" role="alert">
+                        {% for m in messages %}
+                            {{ m }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </form>
+            </div>
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Компания</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Дата рождения</th>
+                    <th>Должность</th>
+                    <th>Сотовый телефон</th>
+                    <th>Телефон</th>
+                    <th>Внутр. телефон</th>
+                    <th>email</th>
+                    <th>Уволен</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.fired == 'да' %}
+                        <td><s>{{ el.id }}</s></td>
+                        <td><s>{{ el.company }}</s></td>
+                        <td><s>{{ el.surname }}</s></td>
+                        <td><s>{{ el.first_name }}</s></td>
+                        <td><s>{{ el.second_name }}</s></td>
+                        <td><s>{{ el.birthday }}</s></td>
+                        <td><s>{{ el.position }}</s></td>
+                        <td style="white-space: nowrap;"><s>{{ el.cellular.as_national }}</s></td>
+                        <td style="white-space: nowrap;"><s>{{ el.telephone.as_national }}</s></td>
+                        <td><s>{{ el.internal_telephone }}</s></td>
+                        <td style="white-space: nowrap;"><s>{{ el.email }}</s></td>
+                        <td><s>{{ el.fired }}</s></td>
+                    {% else %}
+                        <td>{{ el.id }}</td>
+                        <td>{{ el.company }}</td>
+                        <td>{{ el.surname }}</td>
+                        <td>{{ el.first_name }}</td>
+                        <td>{{ el.second_name }}</td>
+                        <td>{{ el.birthday }}</td>
+                        <td>{{ el.position }}</td>
+                        <td style="white-space: nowrap;">{{ el.cellular.as_national }}</td>
+                        <td style="white-space: nowrap;">{{ el.telephone.as_national }}</td>
+                        <td>{{ el.internal_telephone }}</td>
+                        <td style="white-space: nowrap;">{{ el.email }}</td>
+                        <td>{{ el.fired }}</td>
+                    {% endif %}
+                    <td>
+                        {% if request.user|has_group:"WorkersEdit" %}
+                            <a href="#" class="button_table" data-url="{% url 'workers_update' el.id %}">
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="bi bi-gear"></i>
+                                </button>
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if request.user|has_group:"WorkersEdit" %}
+                            <form id="delete_form_{{ el.id }}" action="{% url 'workers_delete' el.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="14"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Сотрудники-->
+            <div class="modal fade" id="modal_workers" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_workers_Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_workers_Label">Добавить сотрудника</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_workers_form" method="post">
+                                {% csrf_token %}
+                                {{ form }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_workers_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Компании{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <h1>Компании</h1>
+            <!-- Кнопка-триггер модального окна - Компании-->
+            <button type="button" class="btn btn-secondary btn-sm button_doc" data-bs-toggle="modal"
+                    data-bs-target="#modal_companies"><i class="bi bi-plus-lg"></i>Добавить запись
+            </button>
+            {% if messages %}
+                <div class="alert alert-dark" role="alert">
+                    {% for m in messages %}
+                        {{ m }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Индекс</th>
+                    <th>Телефон</th>
+                    <th>Почтовый адрес</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in companies %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    <td>{{ el.name }}</td>
+                    <td>{{ el.index }}</td>
+                    <td>{{ el.telephone.as_national }}</td>
+                    <td>{{ el.mailing_address }}</td>
+                    <td><a href="#" class="button_table" data-url="{% url 'companies_update' el.id %}">
+                        <button class="btn btn-secondary btn-sm">
+                        <i class="bi bi-gear"></i></button></a></td>
+                    <td><form id="delete_form_{{ el.id }}" action="{% url 'companies_delete' el.id %}" method="post">
+                        {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Компании-->
+            <div class="modal fade" id="modal_companies" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_companies_Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_companies_Label">Добавить компанию</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_companies_form" method="post">
+                                {% csrf_token %}
+                                {{ form }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_companies_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Дни рождения{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <h1>Дни рождения</h1><br>
+            <p>в этом месяце: <span style="font-weight:bold">{{ current_month }}</span></p>
+        <table>
+            <thead class="thead_birthday">
+                <tr>
+                    <th>Компания</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Дата рождения</th>
+                    <th>Возраст на сегодня</th>
+                    <th>Должность</th>
+                    <th>Внутр. телефон</th>
+                    <th>Сотовый телефон</th>
+                    <th>Телефон</th>
+                    <th>email</th>
+                </tr>
+            </thead>
+                {% for el in workers_this_month %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.fired == 'да' %}
+                    {% else %}
+                        {% if el.is_birthday_today %}
+                            <td style="background-color: #d96868"; white-space: nowrap;>{{ el.company }}</td>
+                            <td style="background-color: #d96868">{{ el.surname }}</td>
+                            <td style="background-color: #d96868">{{ el.first_name }}</td>
+                            <td style="background-color: #d96868">{{ el.second_name }}</td>
+                            <td style="background-color: #d96868; text-align:center">{{ el.birthday }}</td>
+                            <td style="background-color: #d96868; font-weight:bold; text-align:center">{{ el.age }}</td>
+                            <td style="background-color: #d96868">{{ el.position }}</td>
+                            <td style="background-color: #d96868">{{ el.internal_telephone }}</td>
+                            <td style="background-color: #d96868; white-space: nowrap;">{{ el.cellular.as_national }}</td>
+                            <td style="background-color: #d96868; white-space: nowrap;">{{ el.telephone.as_national }}</td>
+                            <td style="background-color: #d96868; white-space: nowrap;">
+                                <a href="mailto:{{ el.email }}" style="text-decoration:none; color:black;">{{ el.email }}</a></td>
+                        {% else %}
+                            <td style="white-space: nowrap;">{{ el.company }}</td>
+                            <td>{{ el.surname }}</td>
+                            <td>{{ el.first_name }}</td>
+                            <td>{{ el.second_name }}</td>
+                            <td style="text-align:center">{{ el.birthday }}</td>
+                            <td style="font-weight:bold; text-align:center">{{ el.age }}</td>
+                            <td>{{ el.position }}</td>
+                            <td>{{ el.internal_telephone }}</td>
+                            <td style="white-space: nowrap;">{{ el.cellular.as_national }}</td>
+                            <td style="white-space: nowrap;">{{ el.telephone.as_national }}</td>
+                            <td style="white-space: nowrap;"><a href="mailto:{{ el.email }}" style="text-decoration:none; color:black;">{{ el.email }}</a></td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table><br><br>
+        <p>в следующем месяце: <span style="font-weight:bold">{{ next_month_name }}</span></p>
+        <table>
+            <thead class="thead_birthday">
+                <tr>
+                    <th>Компания</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Дата рождения</th>
+                    <th>Сколько будет?</th>
+                    <th>Должность</th>
+                    <th>Внутр. телефон</th>
+                    <th>Сотовый телефон</th>
+                    <th>Телефон</th>
+                    <th>email</th>
+                </tr>
+            </thead>
+                {% for el in workers_next_month %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.fired == 'да' %}
+                    {% else %}
+                        <td style="white-space: nowrap;">{{ el.company }}</td>
+                        <td>{{ el.surname }}</td>
+                        <td>{{ el.first_name }}</td>
+                        <td>{{ el.second_name }}</td>
+                        <td style="text-align:center">{{ el.birthday }}</td>
+                        <td style="font-weight:bold; text-align:center">{{ el.age }}</td>
+                        <td>{{ el.position }}</td>
+                        <td>{{ el.internal_telephone }}</td>
+                        <td style="white-space: nowrap;">{{ el.cellular.as_national }}</td>
+                        <td style="white-space: nowrap;">{{ el.telephone.as_national }}</td>
+                        <td style="white-space: nowrap;"><a href="mailto:{{ el.email }}" style="text-decoration:none; color:black;">{{ el.email }}</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endblock %}

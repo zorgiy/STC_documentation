@@ -1,0 +1,115 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Журнал регистрации дополнительных соглашений{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top">
+                <h1>Журнал регистрации дополнительных соглашений</h1>
+                <!-- Форма фильтрации -->
+                <form method="get" class="d-flex">
+                    <div class="me-2">{{ filter.form.log_add_agreements_year }}</div>
+                    <div class="me-2">{{ filter.form.company }}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_filter">Фильтровать</button>
+                <!-- Кнопка-триггер модального окна - Журнал регистрации дополнительных соглашений-->
+                <button type="button" class="btn btn-secondary btn-sm button_doc ms-auto" data-bs-toggle="modal"
+                        data-bs-target="#modal_log_add_agreements"><i class="bi bi-plus-lg"></i>Добавить запись
+                </button>
+                {% if messages %}
+                    <div class="alert alert-dark" role="alert">
+                        {% for m in messages %}
+                            {{ m }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </form>
+            </div>
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>Компания</th>
+                    <th>№</th>
+                    <th>Дата</th>
+                    <th>Сотрудник</th>
+                    <th>Содержание</th>
+                    <th>№ трудового договора</th>
+                    <th>Дата трудового договора</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.status == 'нет приказа' %}
+                    <tr style="background-color: #d96868;">
+                    {% elif el.status == 'номер занят' %}
+                    <tr style="background-color: #f2e985;">
+                    {% elif el.status == 'подшит' %}
+                    <tr style="background-color: #8ad968;">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{ el.company }}</td>
+                        <td>{{ el.number }}</td>
+                        <td>{{ el.date }}</td>
+                        <td>{{ el.worker }}</td>
+                        <td>{{ el.content }}</td>
+                        <td>{{ el.contract_number }}</td>
+                        <td>{{ el.contract_date }}</td>
+                        <td><a href="#" class="button_table" data-url="{% url 'log_add_agreements_update' el.id %}">
+                            <button class="btn btn-secondary btn-sm">
+                            <i class="bi bi-gear"></i></button></a></td>
+                        <td><form id="delete_form_{{ el.id }}" action="{% url 'log_add_agreements_delete' el.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="9"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Журнал регистрации дополнительных соглашений-->
+            <div class="modal fade" id="modal_log_add_agreements" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_log_add_agreements_Label" aria-hidden="true" data-bs-focus="false">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_log_add_agreements_Label">Добавить в журнал рег. доп. соглашений</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_log_add_agreements_form" method="post">
+                                {% csrf_token %}
+                                {{ form.company }}
+                                {{ form.number }}
+                                <label>Дата:</label>{{ form.date }}
+                                <div class="mb-2">{{ form.worker }}</div>
+                                {{ form.content }}
+                                {{ form.contract_number }}
+                                <label>Дата трудового договора:</label>{{ form.contract_date }}
+                                <br><label>Статус:</label>{{ form.status }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_log_add_agreements_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

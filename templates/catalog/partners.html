@@ -1,0 +1,98 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Контрагенты{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top">
+                <h1>Контрагенты</h1>
+                <!-- Форма поиска -->
+                <form method="get" class="d-flex form_index align-items-center">
+                    <div class="me-2">{{ filter.form.q}}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_index">Поиск</button>
+                <!-- Кнопка-триггер модального окна - Контрагенты-->
+                <button type="button" class="btn btn-secondary btn-sm button_index ms-auto" data-bs-toggle="modal"
+                        data-bs-target="#modal_partners"><i class="bi bi-plus-lg"></i>Добавить запись
+                </button>
+                {% if messages %}
+                    <div class="alert alert-dark" role="alert">
+                        {% for m in messages %}
+                            {{ m }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
+            </div>
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Город</th>
+                    <th>Телефон</th>
+                    <th>email</th>
+                    <th>Генеральный директор</th>
+                    <th>Контактное лицо</th>
+                    <th>Почтовый адрес</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    <td>{{ el.name }}</td>
+                    <td>{{ el.city }}</td>
+                    <td style="white-space: nowrap;">{{ el.telephone.as_national }}</td>
+                    <td>{{ el.email }}</td>
+                    <td>{{ el.general_director }}</td>
+                    <td>{{ el.the_contact_person }}</td>
+                    <td>{{ el.mailing_address }}</td>
+                    <td><a href="#" class="button_table" data-url="{% url 'partners_update' el.id %}">
+                        <button class="btn btn-secondary btn-sm">
+                        <i class="bi bi-gear"></i></button></a></td>
+                    <td><form id="delete_form_{{ el.id }}" action="{% url 'partners_delete' el.id %}" method="post">
+                        {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="9"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Контрагенты-->
+            <div class="modal fade" id="modal_partners" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_partners_Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_partners_Label">Добавить контрагента</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_partners_form" method="post">
+                                {% csrf_token %}
+                                {{ form }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_partners_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

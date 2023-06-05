@@ -1,0 +1,53 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Справочник{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top_index">
+                <h1>Справочник</h1>
+                <div class="phonebook_text">
+                    Общий входящий номер <b>8 (3452) 565-999</b>.
+                    Наберите внутренний номер сотрудника для связи.
+                </div>
+                <!-- Форма поиска -->
+                <form method="get" class="d-flex form_index align-items-center">
+                    <div class="me-2">{{ filter.form.q}}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_index">Поиск</button>
+                </form>
+            </div>
+        <table>
+            <thead class="thead_index">
+                <tr>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Сотовый телефон</th>
+                    <th>Телефон</th>
+                    <th>Внутр. телефон</th>
+                    <th>Электронная почта</th>
+                    <th>Должность</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.fired == 'да' %}
+                    {% else %}
+                        <td>{{ el.surname }}</td>
+                        <td>{{ el.first_name }}</td>
+                        <td>{{ el.second_name }}</td>
+                        <td style="white-space: nowrap;">{{ el.cellular.as_national }}</td>
+                        <td style="white-space: nowrap;">{{ el.telephone.as_national }}</td>
+                        <td>{{ el.internal_telephone }}</td>
+                        <td style="white-space: nowrap;"><a href="mailto:{{ el.email }}" style="text-decoration:none; color:black;">{{ el.email }}</a></td>
+                        <td>{{ el.position }}</td>
+                    {% endif %}
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="8"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endblock %}

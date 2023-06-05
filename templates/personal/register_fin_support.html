@@ -1,0 +1,118 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Реестр выдачи материальной помощи{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top">
+                <h1>Реестр выдачи материальной помощи</h1>
+                <!-- Форма фильтрации -->
+                <form method="get" class="d-flex">
+                    <div class="me-2">{{ filter.form.register_fin_support_year }}</div>
+                    <div class="me-2">{{ filter.form.company }}</div>
+                    <div class="me-2">{{ filter.form.worker }}</div>
+                    <div class="me-2">{{ filter.form.month_of_issue }}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_filter">Фильтровать</button>
+                <!-- Кнопка-триггер модального окна - Реестр выдачи материальной помощи-->
+                <button type="button" class="btn btn-secondary btn-sm button_doc ms-auto" data-bs-toggle="modal"
+                        data-bs-target="#modal_register_fin_support"><i class="bi bi-plus-lg"></i>Добавить запись
+                </button>
+                {% if messages %}
+                    <div class="alert alert-dark" role="alert">
+                        {% for m in messages %}
+                            {{ m }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </form>
+            </div>
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>Компания</th>
+                    <th>Сотрудник</th>
+                    <th>Должность</th>
+                    <th>Дата приёма</th>
+                    <th>Группа</th>
+                    <th>Сумма</th>
+                    <th>Месяц выдачи</th>
+                    <th>Комментарии</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.status == 'выдано' %}
+                    <tr style="background-color: #8ad968;">
+                    {% elif el.status == 'отказано' %}
+                    <tr style="background-color: #d96868;">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{ el.company }}</td>
+                        <td>{{ el.worker }}</td>
+                        <td>{{ el.position }}</td>
+                        <td>{{ el.date_of_receipt }}</td>
+                        <td>{{ el.group }}</td>
+                        <td>{{ el.amount }}</td>
+                        <td>{{ el.get_month_of_issue_display  }}</td>
+                        <td>{{ el.comments }}</td>
+                        <td><a href="#" class="button_table" data-url="{% url 'register_fin_support_update' el.id %}">
+                            <button class="btn btn-secondary btn-sm">
+                            <i class="bi bi-gear"></i></button></a></td>
+                        <td><form id="delete_form_{{ el.id }}" action="{% url 'register_fin_support_delete' el.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="10"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Реестр выдачи материальной помощи-->
+            <div class="modal fade" id="modal_register_fin_support" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_register_fin_support_Label" aria-hidden="true" data-bs-focus="false">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_register_fin_support_Label">Добавить в реестр выдачи мат. помощи</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_register_fin_support_form" method="post">
+                                {% csrf_token %}
+                                {{ form.company }}
+                                <div class="mb-2">{{ form.worker }}</div>
+                                {{ form.position }}
+                                <label>Дата приёма:</label>{{ form.date_of_receipt }}
+                                <br><label>Группа:</label>{{ form.group }}
+                                <label>Сумма:</label>{{ form.amount }}
+                                <label>Месяц выдачи:</label>{{ form.month_of_issue }}
+                                {{ form.comments }}
+                                <label>Статус:</label>{{ form.status }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_register_fin_support_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

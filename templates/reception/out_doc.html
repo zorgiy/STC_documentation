@@ -1,0 +1,153 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Исходящая документация{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top">
+                <h1>Исходящая документация</h1>
+                <!-- Форма фильтрации -->
+                <form method="get" class="d-flex">
+                    <div class="me-2">{{ filter.form.outgoing_year  }}</div>
+                    <div class="me-2">{{ filter.form.company }}</div>
+                    <div class="me-2">{{ filter.form.client }}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_filter">Фильтровать</button>
+                <!-- Кнопка-триггер модального окна - Исходящая документация-->
+                <button type="button" class="btn btn-secondary btn-sm button_doc ms-auto" data-bs-toggle="modal"
+                        data-bs-target="#modal_out_doc"><i class="bi bi-plus-lg"></i>Добавить запись
+                </button>
+                {% if messages %}
+                    <div class="alert alert-dark" role="alert">
+                        {% for m in messages %}
+                            {{ m }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </form>
+            </div>
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>Индекс</th>
+                    <th>Дата поступления</th>
+                    <th>Контрагент</th>
+                    <th>Краткое содержание</th>
+                    <th>Документ подписал</th>
+                    <th>Исполнитель</th>
+                    <th>Вид отправки</th>
+                    <th>Контроль об исполнении</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    <td style="white-space: nowrap;">{{ el.index }}</td>
+                    <td>{{ el.receipt_date }}</td>
+                    <td>{{ el.client }}</td>
+                    <td>{{ el.summary }}</td>
+                    <td>{{ el.signed }}</td>
+                    <td>{{ el.author }}</td>
+                    <td>{{ el.type_of_receipt }}</td>
+                    <td>{{ el.execution_control }}</td>
+                    <td><a href="#" class="button_table" data-url="{% url 'out_doc_update' el.id %}">
+                        <button class="btn btn-secondary btn-sm">
+                        <i class="bi bi-gear"></i></button></a></td>
+                    <td><form id="delete_form_{{ el.id }}" action="{% url 'out_doc_delete' el.id %}" method="post">
+                        {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="11"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Исходящая документация-->
+            <div class="modal fade" id="modal_out_doc" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_out_doc_Label" aria-hidden="true" data-bs-focus="false">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_out_doc_Label">Добавить исходящую документацию</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_out_doc_form" method="post">
+                                {% csrf_token %}
+                                {{ form.company }}
+                                <label>Дата поступления:</label>{{ form.receipt_date }}
+                                <div class="mb-2">{{ form.client }}
+                                <!-- Кнопка-триггер модального окна - Контрагенты-->
+                                <button type="button" class="btn btn-secondary btn-sm m-1" data-bs-toggle="modal"
+                                        data-bs-target="#modal_partners"><i class="bi bi-plus-lg"></i></button></div>
+                                {{ form.summary }}
+                                <div class="mb-2">{{ form.signed }}</div>
+                                <div class="mb-2">{{ form.author }}</div>
+                                <label>Вид отправки:</label>{{ form.type_of_receipt }}
+                                <label>Контроль об исполнении:</label>{{ form.execution_control }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_out_doc_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- Модальное окно - Контрагенты-->
+            <div class="modal fade" id="modal_partners" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_partners_Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_partners_Label">Добавить контрагента</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="add_partners_form" method="post" action="{% url 'partners' %}">
+                                    {% csrf_token %}
+                                    {{ partners_form }}
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_partners_form" data-bs-target="#modal_out_doc"
+                                    data-bs-toggle="modal" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script>
+        $('#add_partners_form').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                method: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function(data) {
+                    $('#modal_partners').modal('hide');
+                    $('#modal_out_doc #id_client').load(location.href + ' #id_client>*', '');
+                },
+                error: function(data) {
+                    alert('Ошибка: ' + data.responseText);
+                }
+            });
+        });
+    </script>
+    {% endblock %}

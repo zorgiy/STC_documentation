@@ -1,0 +1,36 @@
+from django.urls import path
+
+from apps.personal import views
+
+urlpatterns = [
+    path('log_acts', views.LogActsListView.as_view(), name='log_acts'),
+    path('log_acts_update/<int:pk>', views.LogActsUpdateView.as_view(), name='log_acts_update'),
+    path('log_acts_delete/<int:pk>', views.LogActsDeleteView.as_view(), name='log_acts_delete'),
+    path('log_contract', views.LogContractListView.as_view(), name='log_contract'),
+    path('log_contract_update/<int:pk>', views.LogContractUpdateView.as_view(), name='log_contract_update'),
+    path('log_contract_delete/<int:pk>', views.LogContractDeleteView.as_view(), name='log_contract_delete'),
+    path('log_add_agreements', views.LogAddAgreementsListView.as_view(), name='log_add_agreements'),
+    path('log_add_agreements_update/<int:pk>', views.LogAddAgreementsUpdateView.as_view(),
+         name='log_add_agreements_update'),
+    path('log_add_agreements_delete/<int:pk>', views.LogAddAgreementsDeleteView.as_view(),
+         name='log_add_agreements_delete'),
+    path('log_orders_K', views.LogOrdersKListView.as_view(), name='log_orders_K'),
+    path('log_orders_K_update/<int:pk>', views.LogOrdersKUpdateView.as_view(), name='log_orders_K_update'),
+    path('log_orders_K_delete/<int:pk>', views.LogOrdersKDeleteView.as_view(), name='log_orders_K_delete'),
+    path('log_orders_LS', views.LogOrdersLSListView.as_view(), name='log_orders_LS'),
+    path('log_orders_LS_update/<int:pk>', views.LogOrdersLSUpdateView.as_view(), name='log_orders_LS_update'),
+    path('log_orders_LS_delete/<int:pk>', views.LogOrdersLSDeleteView.as_view(), name='log_orders_LS_delete'),
+    path('log_orders_Sh', views.LogOrdersShListView.as_view(), name='log_orders_Sh'),
+    path('log_orders_Sh_update/<int:pk>', views.LogOrdersShUpdateView.as_view(), name='log_orders_Sh_update'),
+    path('log_orders_Sh_delete/<int:pk>', views.LogOrdersShDeleteView.as_view(), name='log_orders_Sh_delete'),
+    path('log_work_contracts', views.LogWorkContractsListView.as_view(), name='log_work_contracts'),
+    path('log_work_contracts_update/<int:pk>', views.LogWorkContractsUpdateView.as_view(),
+         name='log_work_contracts_update'),
+    path('log_work_contracts_delete/<int:pk>', views.LogWorkContractsDeleteView.as_view(),
+         name='log_work_contracts_delete'),
+    path('register_fin_support', views.RegisterFinSupportListView.as_view(), name='register_fin_support'),
+    path('register_fin_support_update/<int:pk>', views.RegisterFinSupportUpdateView.as_view(),
+         name='register_fin_support_update'),
+    path('register_fin_support_delete/<int:pk>', views.RegisterFinSupportDeleteView.as_view(),
+         name='register_fin_support_delete'),
+]

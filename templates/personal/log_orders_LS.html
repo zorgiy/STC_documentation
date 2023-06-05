@@ -1,0 +1,117 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Журнал регистрации приказов - ЛС{% endblock %}
+
+    {% block content %}
+        <div class="features">
+            <div class="fixed-top">
+                <h1>Журнал регистрации приказов - ЛС</h1>
+                <!-- Форма фильтрации -->
+                <form method="get" class="d-flex">
+                    <div class="me-2">{{ filter.form.log_orders_LS_year }}</div>
+                    <div class="me-2">{{ filter.form.company }}</div>
+                    <div class="me-2">{{ filter.form.worker }}</div>
+                    <div class="me-2">{{ filter.form.reason }}</div>
+                    <button type="submit" class="btn btn-secondary btn-sm button_filter">Фильтровать</button>
+                <!-- Кнопка-триггер модального окна - Журнал регистрации приказов - ЛС-->
+                <button type="button" class="btn btn-secondary btn-sm button_doc ms-auto" data-bs-toggle="modal"
+                        data-bs-target="#modal_log_orders_LS"><i class="bi bi-plus-lg"></i>Добавить запись
+                </button>
+                {% if messages %}
+                    <div class="alert alert-dark" role="alert">
+                        {% for m in messages %}
+                            {{ m }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </form>
+            </div>
+            {% if update %}
+                <form id="update_data" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            {% else %}
+            <table>
+            <thead>
+                <tr>
+                    <th>Компания</th>
+                    <th>№</th>
+                    <th>Дата</th>
+                    <th>Сотрудник</th>
+                    <th>Причина</th>
+                    <th>Описание</th>
+                    <th>Период</th>
+                    <th>Ред</th>
+                    <th>Удал</th>
+                </tr>
+            </thead>
+                {% for el in filter.qs %}
+                <tr {% if el.id|slugify == request.GET.id %} style="background: dimgray" {% endif %}>
+                    {% if el.status == 'нет приказа' %}
+                    <tr style="background-color: #d96868;">
+                    {% elif el.status == 'номер занят' %}
+                    <tr style="background-color: #f2e985;">
+                    {% elif el.status == 'подшит' %}
+                    <tr style="background-color: #8ad968;">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{ el.company }}</td>
+                        <td>{{ el.number }}</td>
+                        <td>{{ el.date }}</td>
+                        <td>{{ el.worker }}</td>
+                        <td>{{ el.reason }}</td>
+                        <td>{{ el.description }}</td>
+                        <td>{{ el.period }}</td>
+                        <td><a href="#" class="button_table" data-url="{% url 'log_orders_LS_update' el.id %}">
+                            <button class="btn btn-secondary btn-sm">
+                            <i class="bi bi-gear"></i></button></a></td>
+                        <td><form id="delete_form_{{ el.id }}" action="{% url 'log_orders_LS_delete' el.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Вы уверены?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                </tr>
+                    {% empty %}
+                <tr>
+                    <td colspan="8"><p><b>Нет данных для отображения</b></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            <!-- Модальное окно - Журнал регистрации приказов - ЛС-->
+            <div class="modal fade" id="modal_log_orders_LS" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="modal_log_orders_LS_Label" aria-hidden="true" data-bs-focus="false">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal_log_orders_LS_Label">Добавить в журнал рег. приказов - ЛС</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_log_orders_LS_form" method="post">
+                                {% csrf_token %}
+                                {{ form.company }}
+                                {{ form.number }}
+                                <label>Дата:</label>{{ form.date }}
+                                <div class="mb-2">{{ form.worker }}</div>
+                                <label>Причина:</label>{{ form.reason }}
+                                {{ form.description }}
+                                {{ form.period }}
+                                <label>Статус:</label>{{ form.status }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                            <button form="add_log_orders_LS_form" type="submit" class="btn btn-secondary btn-sm">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
