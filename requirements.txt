@@ -1,4 +1,4 @@
-Django==4.2.3
+Django==4.2.7
 django-phonenumber-field==7.1.0
 django-filter==23.2
 django-select2==8.1.2
