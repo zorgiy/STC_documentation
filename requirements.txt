@@ -1,6 +1,6 @@
-Django==4.2.10
+Django==4.2.11
 django-phonenumber-field==7.3.0
-django-filter==23.5
+django-filter==24.1
 django-select2==8.1.2
-phonenumbers==8.13.31
-mssql-django==1.4
+phonenumbers==8.13.32
+mssql-django==1.4.2
